@@ -30,6 +30,7 @@
 #include <QScrollArea>
 
 #include <QTime>
+#include <QProcess>
 
 /* #include <QtSerialPort/QSerialPortInfo> */
 
@@ -154,6 +155,18 @@ public: // спецификатор доступа public
 LAMPhDevices::LAMPhDevices(QString loginQString)
 {
 
+    //QString arguments = "C:\\Users\\Ilnur\\Desktop\\5pairs.vspe -minimize -hide_splash";
+
+
+    QStringList arguments;
+        arguments << "C:\\Users\\Ilnur\\Desktop\\5pairs.vspe" << "-minimize" << "-hide_splash";
+
+    //QProcess process;
+    //process.startDetached("./Emulator/VSPEmulator.exe", arguments);
+
+    //process.waitForStarted(3000);
+    //process.waitForFinished (30);
+
     addToolBar(Qt::TopToolBarArea, toolBar());
 
     addToolBar(Qt::LeftToolBarArea, toolBar_GET());
@@ -184,8 +197,10 @@ LAMPhDevices::LAMPhDevices(QString loginQString)
 
     setWindowTitle(tr("LAMPhDevices - %1 ").arg(login->toLower()));
     //showFullScreen();
-    //showMaximized();
+    showMaximized();
+    //hide();
     //this->setWindowState(Qt::WindowMaximized);
+    //this->setWindowState(Qt::WindowMinimized);
 
     for (int i=0; i<5; i++)
     {
@@ -229,6 +244,8 @@ void LAMPhDevices::readData()
                 data_tmp.remove("\n");
                 data_tmp.remove("\r");
 
+
+
                 for(int l=0; l<10;l++)
                 {
                     //qDebug() << "l" << l << "box" << comboBox_Pairs[l]->currentIndex();
@@ -250,12 +267,29 @@ void LAMPhDevices::readData()
                         if ("*"==received[l]->text()){
                             comSerialPort[i]->write(data_send.toLocal8Bit());
                         }
+                        else if (received[l]->text().contains("byte:", Qt::CaseInsensitive)){
+                            //dataByteArray
+                            for(int r=0; r<6; r++) {
+                                qDebug() << dataByteArray[r];
+                            }
+
+
+                            comSerialPort[i]->write(data_send.toLocal8Bit());
+                        }
                         else if(data_tmp==received[l]->text()){
                             comSerialPort[i]->write(data_send.toLocal8Bit());
                         }
 
                     }
                 }
+                QStringList status;
+                status << "COM:" << QString::number(2*i+11) << "; Received:" << data_tmp << "; Send:" << data_send << ";";
+
+
+                // " Received:" + data_tmp + " Send:" + data_send;
+                statusBar()->showMessage( status.join("") );
+
+
                 //comSerialPort[i]->write(data_n);
         }
 
