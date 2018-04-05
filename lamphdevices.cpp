@@ -260,6 +260,9 @@ void LAMPhDevices::readData()
                         else if(""==send[l]->text()) {
                             data_send="empty";
                         }
+                        else if(send[l]->text().contains("byte:", Qt::CaseInsensitive)) {
+                            data_send=data_tmp;
+                        }
                         else{
                             data_send=send[l]->text();
                         }
