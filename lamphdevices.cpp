@@ -241,8 +241,57 @@ void LAMPhDevices::readData()
                 std::string result_tmp = dataByteArray.toStdString();
                 QString data_tmp = QString::fromStdString(result_tmp);
                 QString data_send;
+                QString data_received;
                 data_tmp.remove("\n");
                 data_tmp.remove("\r");
+
+                /*QString data_new = QString::fromStdString(dataByteArray.toStdString().c_str());
+
+
+                qDebug(dataByteArray);
+                qDebug() << "data_tmp" << data_tmp;
+                qDebug("/");
+                qDebug() << "data_new" << data_new;
+                qDebug("/");
+
+                char *buff = dataByteArray.data();
+                int buff_int[24];
+
+                for (int l=0; l<24; l++){
+                    buff_int[l]=buff[l];
+                    qDebug("buff_int[%d]: %d", l, buff_int[l]);
+                }
+
+                data_send = "byte: 00 00 55 55 AA";
+
+                if (data_send.contains("byte:", Qt::CaseInsensitive)){
+                    data_send.remove("byte:");
+                    QByteArray text = QByteArray::fromHex(data_send.toLocal8Bit());
+                    comSerialPort[i]->write(text);
+                }else
+                {
+                    comSerialPort[i]->write(data_send.toLocal8Bit());
+                }*/
+
+                //QString data_tmp3(text.toHex());
+
+                /*data_send = "00 00 55 55 AA 55 ";
+                QByteArray text = QByteArray::fromHex(data_send.toLocal8Bit());
+                //comSerialPort[i]->write(text);
+
+
+                std::string stdString(text.constData(), text.length());
+
+                QString data_tmp2 = QString::fromStdString(stdString);
+
+                qDebug() << stdString.data();
+
+                comSerialPort[i]->write(data_tmp2.toLocal8Bit());*/
+
+                //QString data_tmp3 = QString::fromStdString(text.toStdString());
+                //comSerialPort[i]->write(data_tmp3.toLocal8Bit());
+
+
 
 
 
@@ -250,6 +299,8 @@ void LAMPhDevices::readData()
                 {
                     //qDebug() << "l" << l << "box" << comboBox_Pairs[l]->currentIndex();
                     if (i == comboBox_Pairs[l]->currentIndex()){
+
+
                         if ("time"==send[l]->text()) {
                             QDateTime date=QDateTime::currentDateTime();
                             data_send =date.toString("mm.ss");
@@ -261,23 +312,25 @@ void LAMPhDevices::readData()
                             data_send="empty";
                         }
                         else if(send[l]->text().contains("byte:", Qt::CaseInsensitive)) {
-                            data_send=data_tmp;
+                            data_send = send[l]->text();
+                            data_send.remove("byte:");
+                            data_send = QString::fromStdString(QByteArray::fromHex(data_send.toLocal8Bit()).toStdString());
                         }
                         else{
                             data_send=send[l]->text();
                         }
 
+
                         if ("*"==received[l]->text()){
                             comSerialPort[i]->write(data_send.toLocal8Bit());
                         }
                         else if (received[l]->text().contains("byte:", Qt::CaseInsensitive)){
-                            //dataByteArray
-                            for(int r=0; r<6; r++) {
-                                qDebug() << dataByteArray[r];
+                            data_received = received[l]->text();
+                            data_received.remove("byte:");
+                            QString data_received2= (dataByteArray.toHex());
+                            if (data_received2.contains(data_received, Qt::CaseInsensitive)){
+                               comSerialPort[i]->write(data_send.toLocal8Bit());
                             }
-
-
-                            comSerialPort[i]->write(data_send.toLocal8Bit());
                         }
                         else if(data_tmp==received[l]->text()){
                             comSerialPort[i]->write(data_send.toLocal8Bit());
@@ -285,6 +338,8 @@ void LAMPhDevices::readData()
 
                     }
                 }
+
+
                 QStringList status;
                 status << "COM:" << QString::number(2*i+11) << "; Received:" << data_tmp << "; Send:" << data_send << ";";
 
@@ -294,6 +349,9 @@ void LAMPhDevices::readData()
 
 
                 //comSerialPort[i]->write(data_n);
+
+
+
         }
 
     }
@@ -417,6 +475,27 @@ QToolBar *LAMPhDevices::toolBar_GET()
         gridLayout->addWidget(send_txt[i], i+1, 3);
         gridLayout->addWidget(send[i], i+1, 4);
     }
+
+    send[0]->setText(QString("*"));
+    received[0]->setText(QString("*"));
+    send[1]->setText(QString("time"));
+    received[1]->setText(QString("*"));
+    send[2]->setText(QString("byte:00005555"));
+    received[2]->setText(QString("*"));
+    send[3]->setText(QString("byte:00005555"));
+    received[3]->setText(QString("byte:00005555"));
+    send[4]->setText(QString("*"));
+    received[4]->setText(QString("byte:00005555"));
+    send[5]->setText(QString("time"));
+    received[5]->setText(QString("byte:00005555"));
+    send[6]->setText(QString("*"));
+    received[6]->setText(QString("*"));
+    send[7]->setText(QString("0.0012,0.0023"));
+    received[7]->setText(QString(":READ?"));
+    send[8]->setText(QString("0.0012;0.0023"));
+    received[8]->setText(QString(":READ?"));
+    send[9]->setText(QString("*"));
+    received[9]->setText(QString("*"));
 
     //gridLayout->addWidget(button_ReceivedData_Close,12,2);
     //gridLayout->addWidget(button_ReceivedData_Add,12,1);
